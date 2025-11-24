@@ -23,15 +23,18 @@
 module PC(
 input clk,
 input rst,
+input PC_W,
 input [31:0] data_in,
 output reg [31:0] data_out
     );
-always@(posedge clk,posedge rst)
+always @(posedge clk, posedge rst)
 begin
-if(rst)
-    data_out<=32'b0;
+if (rst)
+    data_out <= 32'b0;
+else if (PC_W)
+    data_out <= data_in;
 else
-    data_out<=data_in;
-end    
-    
+    data_out <= data_out;
+end
+
 endmodule

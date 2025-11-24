@@ -24,22 +24,7 @@ module decoder(
 input [31:0] inst,
 input clk,
 input zero,
-output IM_R,
-output M3,
-//output M4_0,
-//output M4_1,
-output M4,
-output [2:0] ALUC,
-output M2,
-output RF_W,
-//output RF_CLK,
-output M5,
-output M1,
-output DM_CS,
-output DM_R,
-output DM_W,
-output M6,
-output sign_ext
+output addu, subu, ori, sll, lw, sw, beq, j_i
     );
     
 wire [5:0] func=inst[5:0];  
@@ -56,28 +41,5 @@ assign sw=op[5]&~op[4]&op[3]&~op[2]&op[1]&op[0];
 assign beq=~op[5]&~op[4]&~op[3]&op[2]&~op[1]&~op[0];
 assign j_i=~op[5]&~op[4]&~op[3]&~op[2]&op[1]&~op[0];
 
-assign IM_R=1;
- 
-assign RF_W=addu|subu|ori|sll|lw;
-
-assign DM_CS=lw|sw;
-assign DM_R=lw;
-assign DM_2=sw;
-assign DM_W=sw;
-
-assign ALUC[2]=0;
-assign ALUC[1]=ori|sll;
-assign ALUC[0]=subu|beq|sll;
-
-assign M1=addu|subu|ori|sll|beq|lw|sw;
-assign M2=addu|subu|ori|sll|beq|j_i|sw;
-assign M3=addu|subu|ori|j_i|beq|lw|sw;
-//assign M4_0=ori;
-//assign M4_1=lw|sw;
-assign M4=lw|sw|ori;
-assign M5=beq&zero;
-assign M6=ori|lw;
-
-assign sign_ext=lw | sw;
 
 endmodule

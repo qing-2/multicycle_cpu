@@ -30,9 +30,11 @@ output reg [WIDTH-1:0] r
     begin
       case(select)
         1'b0:
-        r=a;
+          r=a;
         1'b1:
-        r=b;
+          r=b;
+        default:
+          r=32'b0;
       endcase
     end
 endmodule
