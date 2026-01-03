@@ -97,8 +97,6 @@ always @(*) begin
         end
 
         ID: begin // Instruction Decode
-            Rs_W = 1'b1;          // 读寄存器文件
-            Rt_W = 1'b1;          // 读寄存器文件
         end
 
         EX: begin // Execution
