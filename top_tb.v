@@ -39,15 +39,15 @@ module top_tb;
     initial 
     begin
         clk_in = 0;
-        forever #100 clk_in = ~clk_in;
+        forever #10 clk_in = ~clk_in;
     end
 
     initial
     begin
         reset = 0;
-        #50 reset=1;
+        #5 reset=1;
         #10 reset=0;
-        #2000 $stop;
+        #1000 $stop;
     end
         
     initial // 用iverilog+gtkwave仿真时用到的

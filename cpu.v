@@ -45,6 +45,12 @@ wire [31:0] ext5_out,ext16_out,ext18_out;
 wire [31:0] npc_out;
 wire [31:0] join_out;
 wire [27:0] imm16_offset;
+
+// 为了分段，相较于单周期CPU需要额外添加寄存器
+reg [31:0] IR_reg;         // 指令寄存器
+reg [31:0] rs_reg, rt_reg; // 操作数寄存器  
+reg [31:0] alu_out_reg;    // ALU结果寄存器
+reg [31:0] MDR_reg;        // 内存数据寄存器
     
 assign alu_r = alu_out_reg;
 assign maddr = alu_out_reg;
@@ -90,13 +96,7 @@ assign alu_input_b =
     (ALU_B_Sel == 2'b11) ? ext18_out : 32'b0;
     
 
-// 为了分段，相较于单周期CPU需要额外添加寄存器
-reg [31:0] IR_reg;         // 指令寄存器
-reg [31:0] rs_reg, rt_reg; // 操作数寄存器  
-reg [31:0] alu_out_reg;    // ALU结果寄存器
-reg [31:0] MDR_reg;        // 内存数据寄存器
-
-always @(posedge clk) begin
+always @(posedge clk or posedge reset) begin
     if (reset) begin
         IR_reg <= 32'b0;
         rs_reg <= 32'b0;

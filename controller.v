@@ -5,30 +5,31 @@ input clk,
 input reset,
 input zero,
 input addu, subu, ori, sll, lw, sw, beq, j_i,
-output PC_W, IR_W, RF_W, ALUOut_W,
-output [1:0] ALU_A_Sel, ALU_B_Sel,
-output [2:0] ALUC,
-output MemtoReg,
-output IM_R,
-output DM_R,
-output DM_W,
-output DM_CS,
-output sign_ext
+output reg PC_W, IR_W, RF_W, ALUOut_W,
+output reg [1:0] ALU_A_Sel, ALU_B_Sel,
+output reg [2:0] ALUC,
+output reg MemtoReg,
+output reg IM_R,
+output reg DM_R,
+output reg DM_W,
+output reg DM_CS,
+output reg sign_ext
     );
 
 
  /// part1. 状态机
-parameter [3:0] IF  = 0, ID  = 1, EX  = 2, MEM = 3, WB  = 4, BRANCH = 5;
+parameter [3:0] INIT = 0, IF  = 1, ID  = 2, EX  = 3, MEM = 4, WB  = 5, BRANCH = 6;
 
 reg [2:0] state, next_state;
 always @(posedge clk or posedge reset) begin
-    if (reset) state <= IF;
+    if (reset) state <= INIT;
     else state <= next_state;
 end
 
 always @(*) begin
     case (state)
-        IF: next_state = ID;  // 取指后总是进入译码
+        INIT: next_state = IF; // 初始化后进入取指阶段
+        IF: next_state = ID;   // 取指后总是进入译码
         
         ID: begin
             if (lw | sw | addu | subu | ori | sll | beq)
@@ -59,15 +60,13 @@ always @(*) begin
         
         WB: next_state = IF;       // 写回后结束
         
-        default: next_state = IF;
+        default: next_state = INIT;
     endcase
 end
 
 
 
 /// part2. 生成控制信号
-wire sign_ext;
-wire [1:0] ALU_A_Sel, ALU_B_Sel;
 always @(*) begin
     // 默认值 - 所有信号置0
     PC_W   = 1'b0;
@@ -91,7 +90,7 @@ always @(*) begin
             IR_W = 1'b1;         // 写指令寄存器
             ALU_A_Sel = 2'b00;   // ALU输入A = PC
             ALU_B_Sel = 2'b01;   // ALU输入B = 4
-            ALUC = 3'b010;       // ALU做加法 (PC+4)
+            ALUC = 3'b000;       // ALU做加法 (PC+4)
             ALUOut_W = 1'b1;     // 保存ALU结果
 
             PC_W = 1'b1;          // 更新PC
