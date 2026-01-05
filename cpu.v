@@ -36,7 +36,7 @@ output DM_W,
 output [31:0]alu_r  
     );
     
-wire RF_W,M1,M2,M3,M4,M5,M6,sign_ext,zero;
+wire RF_W,sign_ext,zero;
 wire [2:0] ALUC;
 wire [31:0] alu_input_a, alu_input_b;
 wire[31:0] mux1_out,mux2_out,alu_out;

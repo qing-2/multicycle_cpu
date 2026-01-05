@@ -1,4 +1,4 @@
-# 8-instruction single cycle MIPS32 CPU
+# 8-instruction multi-cycle MIPS32 CPU
 ### 1. 打开vivado，新建项目
 ### 2. 添加文件
 ``` 
@@ -9,8 +9,6 @@ Add or create design sources -> Add files -> Add Directories
 ```
 Run Simulation 
 ```
-这是解释代码的视频链接： [MIPS单周期CPU设计 # 视频中dmem.v未对数据存储器进行初始化 会导致lw出错 代码已经改正](https://www.bilibili.com/video/BV1rD4y1D7h9)  <hr/>
-<img src="https://github.com/qing-2/CPU/blob/master/run.png"> 
 
 # 常见问题
 ### 1. 运行不成功？
@@ -32,16 +30,16 @@ Run Simulation
 
 可以发现，数组的下标就是地址除以4，也就是去掉最后两位。
 
-### 4. reg [n:1] RAM [m:1] 是什么意思？
+### 4. reg [n:1] RAM [1:m] 是什么意思？
 定义了一个 名为RAM、包含 m个n位寄存器 的存储器
 
-### 5. lw指令是有符号扩展，M4应该取2（根据decoder那个视频里的图看），为什么代码写的M4是取1？
-因为我把它合并了，用 signed16 这个变量判断是否按符号扩展，m4的取值就只有0和1了，和那张图不一样了，在 module ext16 的代码里标注了，忘记在decoder那p视频里说了，sorry😥
+### 5. 如何在波形图查看其他信号？
+vivado: 在波形图左侧 点scope 可以看到所有模块，选中 右键 add to wave 图里就有这个些变量了，再重新跑一下仿真（Relaunch Simulation）就有波形了
 
 ### 6. 有朋友提到“用vivado仿真还是有点麻烦，主要是vivado现在越来越大了。推荐一个简单的仿真器，iverilog，windows和linux下都方便安装使用。可以搭配gtkwave看仿真波形。”
 我试了一下感觉很好用， [icarus_gtkwave教程有详细介绍](https://brng.dev/blog/technical/tutorial/2019/05/11/icarus_gtkwave/)  ，其中`gtkwave wave.vd`写错了，应该是`gtkwave wave.vcd`
 ### 7. imem.txt 指令是什么含义？
-（第一条sll指令相当于空指令，因为每次reset pc=0 npc就是4 就会错过第一条指令）<br/>
+（第一条sll指令相当于空指令）<br/>
 2022.4.12更新了imem.txt，现在包含全部8条指令，汇编代码如下
 ``` 
 sll  $zero,$zero,0
