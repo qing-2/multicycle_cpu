@@ -1,23 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2020/05/23 17:37:47
-// Design Name: 
-// Module Name: decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
 module decoder(
@@ -30,7 +11,6 @@ output addu, subu, ori, sll, lw, sw, beq, j_i
 wire [5:0] func=inst[5:0];  
 wire [5:0] op=inst[31:26];
 wire r_type=~|op;
-wire addu,subu,ori,sll,lw,sw,beq,j_i;
     
 assign addu=r_type &func[5]&~func[4]&~func[3]&~func[2]&~func[1]&func[0];
 assign subu=r_type &func[5]&~func[4]&~func[3]&~func[2]&func[1]&func[0];    
