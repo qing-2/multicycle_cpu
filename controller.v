@@ -102,11 +102,13 @@ always @(*) begin
             // 根据指令类型选择ALU输入A
             if (sll) 
                 ALU_A_Sel = 2'b10;   // sll指令使用位扩展
+            else if (beq)
+                ALU_A_Sel = 2'b00;   // PC
             else
                 ALU_A_Sel = 2'b01;   // rs_reg
             
             // 根据指令类型选择ALU输入B
-            if (beq | addu | subu)
+            if (addu | subu)
                 ALU_B_Sel = 2'b00;   // rt_reg
             else if (lw | sw | ori) 
                 ALU_B_Sel = 2'b10;   // 扩展立即数
@@ -117,9 +119,9 @@ always @(*) begin
                 sign_ext = 1'b1;    // lw/sw 需要有符号扩展
 
             // ALU操作控制
-            if (addu | lw | sw) 
+            if (addu | lw | sw | beq) 
                 ALUC = 3'b000;  // 加
-            else if (subu | beq) 
+            else if (subu) 
                 ALUC = 3'b001;  // 减
             else if (ori) 
                 ALUC = 3'b010;  // 或
@@ -132,6 +134,7 @@ always @(*) begin
             // ALUC[0] = subu | beq | sll;
             // sign_ext = lw | sw;
 
+            ALUOut_W = 1'b1;
         end
 
         MEM: begin // Memory Access
@@ -146,7 +149,7 @@ always @(*) begin
                 ALU_A_Sel = 2'b01;  // rs_reg
                 ALU_B_Sel = 2'b00;  // rt_reg  
                 ALUC = 3'b001;      // 减
-                ALUOut_W = 1'b0;
+                ALUOut_W = 1'b0;    // don't write to keep the reg to store next pc
                 if (zero)
                     PC_W = 1'b1;   // 条件成立则跳转，覆盖PC
         end

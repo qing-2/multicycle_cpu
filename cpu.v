@@ -17,9 +17,10 @@ output [31:0]alu_r
     );
     
 wire RF_W,sign_ext,zero;
+wire [1:0] ALU_A_Sel, ALU_B_Sel;
 wire [2:0] ALUC;
 wire [31:0] alu_input_a, alu_input_b;
-wire[31:0] mux1_out,mux2_out,alu_out;
+wire [31:0] mux1_out,mux2_out,alu_out;
 wire [31:0] rf_rdata1,rf_rdata2;
 wire [31:0] ext5_out,ext16_out,ext18_out;
 wire [31:0] npc_out;
