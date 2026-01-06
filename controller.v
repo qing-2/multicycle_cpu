@@ -85,18 +85,17 @@ always @(*) begin
 
     case (state)
         IF: begin // Instruction Fetch
-            // 取指阶段：PC→Mem→IR, PC+4→ALU_out
             IM_R = 1'b1;         // 用PC访问内存（取指令）
             IR_W = 1'b1;         // 写指令寄存器
+            // calulate next pc
             ALU_A_Sel = 2'b00;   // ALU输入A = PC
             ALU_B_Sel = 2'b01;   // ALU输入B = 4
             ALUC = 3'b000;       // ALU做加法 (PC+4)
             ALUOut_W = 1'b1;     // 保存ALU结果
-
-            PC_W = 1'b1;          // 更新PC
         end
 
         ID: begin // Instruction Decode
+            PC_W = 1'b1;   // update PC
         end
 
         EX: begin // Execution
@@ -133,7 +132,6 @@ always @(*) begin
             // ALUC[0] = subu | beq | sll;
             // sign_ext = lw | sw;
 
-            ALUOut_W = ~j_i; // 保存ALU结果，直接进入下一阶段
         end
 
         MEM: begin // Memory Access

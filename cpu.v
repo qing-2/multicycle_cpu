@@ -37,7 +37,7 @@ assign maddr = alu_out_reg;
 assign mwdata = rf_rdata2;
 assign imm16_offset = IR_reg[15:0]<<2;
 
-assign npc_out = alu_out; // calculated in alu, instead of NPC module
+assign npc_out = alu_out_reg; // calculated in alu, instead of NPC module
 
 decoder cpu_decoder(IR_reg, clk, zero, addu, subu, ori, sll, lw, sw, beq, j_i);
 
