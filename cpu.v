@@ -49,7 +49,7 @@ controller cpu_controller(clk, reset,zero, addu, subu, ori, sll, lw, sw, beq, j_
 
 PC cpu_pc(clk,reset,PC_W,mux1_out,pc_out);
 
-JOIN cpu_join(inst[25:0] << 2, pc_out[31:28],join_out);
+JOIN cpu_join(IR_reg[25:0] << 2, pc_out[31:28],join_out);
 
 regfile cpu_regfile(clk,reset,RF_W,IR_reg[25:21],IR_reg[20:16], RF_W,mux2_out,rf_rdata1,rf_rdata2);
 
