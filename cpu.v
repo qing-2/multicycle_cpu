@@ -21,26 +21,31 @@ wire [1:0] ALU_A_Sel, ALU_B_Sel;
 wire [2:0] ALUC;
 wire [31:0] alu_input_a, alu_input_b;
 wire [31:0] mux1_out,mux2_out,alu_out;
+wire [4:0]  mux3_out;
 wire [31:0] rf_rdata1,rf_rdata2;
 wire [31:0] ext5_out,ext16_out,ext18_out;
 wire [31:0] npc_out;
 wire [31:0] join_out;
-wire [27:0] imm16_offset;
 
 // 为了分段，相较于单周期CPU需要额外添加寄存器
-reg [31:0] IR_reg;         // 指令寄存器
+reg [31:0] IR;             // 指令寄存器
 reg [31:0] rs_reg, rt_reg; // 操作数寄存器  
 reg [31:0] alu_out_reg;    // ALU结果寄存器
 reg [31:0] MDR_reg;        // 内存数据寄存器
-    
+
+wire [4:0] rs = IR[25:21];
+wire [4:0] rt = IR[20:16]; 
+wire [4:0] rd = IR[15:11];
+wire [17:0] imm16_offset = IR[15:0] << 2;
+wire [27:0] imm26_offset = IR[25:0] << 2;
+
 assign alu_r = alu_out_reg;
 assign maddr = alu_out_reg;
 assign mwdata = rf_rdata2;
-assign imm16_offset = IR_reg[15:0]<<2;
 
 assign npc_out = alu_out_reg; // calculated in alu, instead of NPC module
 
-decoder cpu_decoder(IR_reg, clk, zero, addu, subu, ori, sll, lw, sw, beq, j_i);
+decoder cpu_decoder(IR, clk, zero, addu, subu, ori, sll, lw, sw, beq, j_i);
 
 controller cpu_controller(clk, reset,zero, addu, subu, ori, sll, lw, sw, beq, j_i,
                           PC_W, IR_W, RF_W, ALUOut_W,
@@ -50,19 +55,31 @@ controller cpu_controller(clk, reset,zero, addu, subu, ori, sll, lw, sw, beq, j_
 
 PC cpu_pc(clk,reset,PC_W,mux1_out,pc_out);
 
-JOIN cpu_join(IR_reg[25:0] << 2, pc_out[31:28],join_out);
+JOIN cpu_join(imm26_offset, pc_out[31:28],join_out);
 
-regfile cpu_regfile(clk,reset,RF_W,IR_reg[25:21],IR_reg[20:16], RF_W,mux2_out,rf_rdata1,rf_rdata2);
+regfile cpu_regfile(
+    .clk(clk),
+    .rst(reset),
+    .we(RF_W),
+    .raddr1(rs),
+    .raddr2(rt),
+    .waddr(mux3_out),
+    .wdata(mux2_out),
+    .rdata1(rf_rdata1),
+    .rdata2(rf_rdata2)
+);
 
 alu cpu_alu(alu_input_a,alu_input_b,ALUC,alu_out,zero);
 
-ext5 cpu_ext5(IR_reg[10:6], ext5_out);               // shift amount 扩展
-ext16 cpu_ext16(IR_reg[15:0], sign_ext, ext16_out);  // immediate 扩展
-ext18 cpu_ext18(imm16_offset, ext18_out);            // beq offset 扩展
+ext5 cpu_ext5(IR[10:6], ext5_out);               // shift amount 扩展
+ext16 cpu_ext16(IR[15:0], sign_ext, ext16_out);  // immediate 扩展
+ext18 cpu_ext18(imm16_offset, ext18_out);        // beq offset 扩展
 
 mux2x32 mux1(npc_out, join_out, j_i,mux1_out); // for J instruction   
 
 mux2x32 mux2(alu_out_reg, mrdata, MemtoReg, mux2_out);
+
+mux2x32 #(.WIDTH(5)) mux3(rd, rt, ori | lw, mux3_out); // write back address mux
 
 // ALU输入端选择
 assign alu_input_a = 
@@ -79,14 +96,14 @@ assign alu_input_b =
 
 always @(posedge clk or posedge reset) begin
     if (reset) begin
-        IR_reg <= 32'b0;
+        IR <= 32'b0;
         rs_reg <= 32'b0;
         rt_reg <= 32'b0;
         alu_out_reg <= 32'b0;
         MDR_reg <= 32'b0;
     end else begin
         if (IR_W) 
-            IR_reg <= inst;
+            IR <= inst;
     
         rs_reg <= rf_rdata1;
         rt_reg <= rf_rdata2;
