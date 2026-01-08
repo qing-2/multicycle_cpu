@@ -22,14 +22,15 @@ begin
     i=0;
     while(i<32)
     begin
-      array_reg[i]=0;
+      array_reg[i]=i;
       i=i+1;
     end
   end
-  else if(we)
+  else if(we & (waddr!=0))
   begin
-    if(waddr!=0)
+    $display("write regfile: before: $%d = %d", waddr, array_reg[waddr]);
     array_reg[waddr]=wdata;
+    $display("                       $%d = %d", waddr, array_reg[waddr]);
   end
 end
 

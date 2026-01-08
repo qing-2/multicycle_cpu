@@ -25,8 +25,11 @@ always @(posedge clk)
 begin
   if(CS)
   begin
-    if(DM_W)
-      ROM[addr[31:2]]<=wdata;
+    if(DM_W) begin
+      $display("write memory:  before: Addr: %-1d = %d", addr[31:2], ROM[addr[31:2]]);
+      ROM[addr[31:2]]=wdata;
+      $display("                       Addr: %-1d = %d", addr[31:2], ROM[addr[31:2]]);
+    end
   end
 end
 endmodule
