@@ -77,7 +77,7 @@ ext18 cpu_ext18(imm16_offset, ext18_out);        // beq offset 扩展
 
 mux2x32 mux1(npc_out, join_out, j_i,mux1_out); // for J instruction   
 
-mux2x32 mux2(alu_out_reg, mrdata, MemtoReg, mux2_out);
+mux2x32 mux2(alu_out_reg, MDR_reg, MemtoReg, mux2_out);
 
 mux2x32 #(.WIDTH(5)) mux3(rd, rt, ori | lw, mux3_out); // write back address mux
 
@@ -102,15 +102,19 @@ always @(posedge clk or posedge reset) begin
         alu_out_reg <= 32'b0;
         MDR_reg <= 32'b0;
     end else begin
+        // IF/ID
         if (IR_W) 
             IR <= inst;
     
+        // ID/EX
         rs_reg <= rf_rdata1;
         rt_reg <= rf_rdata2;
 
+        // EX/MEM
         if (ALUOut_W)
             alu_out_reg <= alu_out;
     
+        // MEM/WB
         if (lw)
             MDR_reg <= mrdata;
     end
